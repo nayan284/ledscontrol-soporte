@@ -1001,6 +1001,16 @@ def main():
     global skip_cargo
     parser = make_parser()
     args = parser.parse_args()
+        # --- Personalizacion Ledscontrol ---
+    _cfg = 'libs/hbb_common/src/config.rs'
+    with open(_cfg, encoding='utf-8', newline='') as _f:
+        _s = _f.read()
+    _s = _s.replace('"rs-ny.rustdesk.com"', '"2.29.130.205"')
+    _s = _s.replace('OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=', 'R6xiVanm0y9FpQh1NGZUbaUSxZZrX5V17lEcINdDE18=')
+    with open(_cfg, 'w', encoding='utf-8', newline='') as _f:
+        _f.write(_s)
+    # --- Fin personalizacion ---
+    
 
     # Before anything with a side effect: this is a query, and a caller uses it to build the very
     # binary it will then package. `get_features` stays the single definition of what a flag
