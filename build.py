@@ -1001,16 +1001,31 @@ def main():
     global skip_cargo
     parser = make_parser()
     args = parser.parse_args()
-        # --- Personalizacion Ledscontrol ---
-    _cfg = 'libs/hbb_common/src/config.rs'
-    with open(_cfg, encoding='utf-8', newline='') as _f:
-        _s = _f.read()
-    _s = _s.replace('"rs-ny.rustdesk.com"', '"2.29.130.205"')
-    _s = _s.replace('OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=', 'R6xiVanm0y9FpQh1NGZUbaUSxZZrX5V17lEcINdDE18=')
-    with open(_cfg, 'w', encoding='utf-8', newline='') as _f:
-        _f.write(_s)
+    # --- Personalizacion Ledscontrol ---
+    _cambios = {
+        'libs/hbb_common/src/config.rs': [
+            ('"rs-ny.rustdesk.com"', '"2.29.130.205"'),
+            ('OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=', 'R6xiVanm0y9FpQh1NGZUbaUSxZZrX5V17lEcINdDE18='),
+            ('RwLock::new("RustDesk".to_owned())', 'RwLock::new("LedscontrolRemote".to_owned())'),
+        ],
+        'Cargo.toml': [
+            ('ProductName = "RustDesk"', 'ProductName = "Ledscontrol Remote"'),
+            ('FileDescription = "RustDesk Remote Desktop"', 'FileDescription = "Ledscontrol Remote"'),
+        ],
+        'flutter/windows/runner/Runner.rc': [
+            ('"Purslane Tech Pte. Ltd."', '"Ledscontrol"'),
+            ('"RustDesk Remote Desktop"', '"Ledscontrol Remote"'),
+            ('VALUE "ProductName", "RustDesk"', 'VALUE "ProductName", "Ledscontrol Remote"'),
+        ],
+    }
+    for _ruta, _pares in _cambios.items():
+        with open(_ruta, encoding='utf-8', newline='') as _f:
+            _s = _f.read()
+        for _a, _b in _pares:
+            _s = _s.replace(_a, _b)
+        with open(_ruta, 'w', encoding='utf-8', newline='') as _f:
+            _f.write(_s)
     # --- Fin personalizacion ---
-    
 
     # Before anything with a side effect: this is a query, and a caller uses it to build the very
     # binary it will then package. `get_features` stays the single definition of what a flag
