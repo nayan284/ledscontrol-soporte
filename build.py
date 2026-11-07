@@ -1002,6 +1002,11 @@ def main():
     parser = make_parser()
     args = parser.parse_args()
     # --- Personalizacion Ledscontrol ---
+    # Si existe el archivo MODO_CLIENTE en la raiz del repositorio, se compila
+    # la version para clientes (solo recibe conexiones). Si no existe, se
+    # compila la version completa para tecnicos.
+    _modo_cliente = os.path.exists('MODO_CLIENTE')
+    print('Ledscontrol Remote: compilando version', 'CLIENTES (solo recibir)' if _modo_cliente else 'TECNICOS (completa)')
     _cambios = {
         'libs/hbb_common/src/config.rs': [
             ('"rs-ny.rustdesk.com"', '"2.29.130.205"'),
@@ -1018,10 +1023,17 @@ def main():
             ('VALUE "ProductName", "RustDesk"', 'VALUE "ProductName", "Ledscontrol Remote"'),
         ],
     }
+    if _modo_cliente:
+        _cambios['libs/hbb_common/src/config.rs'].append((
+            'pub static ref HARD_SETTINGS: RwLock<HashMap<String, String>> = Default::default();',
+            'pub static ref HARD_SETTINGS: RwLock<HashMap<String, String>> = RwLock::new(HashMap::from([("conn-type".to_owned(), "incoming".to_owned())]));',
+        ))
     for _ruta, _pares in _cambios.items():
         with open(_ruta, encoding='utf-8', newline='') as _f:
             _s = _f.read()
         for _a, _b in _pares:
+            if _a not in _s and _b not in _s:
+                print('AVISO Ledscontrol: no se encontro el texto a sustituir en', _ruta, ':', _a[:60])
             _s = _s.replace(_a, _b)
         with open(_ruta, 'w', encoding='utf-8', newline='') as _f:
             _f.write(_s)
